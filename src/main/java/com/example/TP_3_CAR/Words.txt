@@ -1,0 +1,26 @@
+TP 3 – MapReduce avec Akka
+Le but de ce TP est de développer une application Spring qui fournit un service de comptage
+de mots à l’aide du paradigme MapReduce mis en œuvre avec des acteurs Akka.
+On s’intéresse au dénombrement des occurrences de mots contenus dans un fichier texte. Pour
+cela, on divise la tâche de comptage en deux sous-tâches dites map et reduce, implémentées
+respectivement par des acteurs Mapper et Reducer. Soit l’architecture illustrée dans la figure
+suivante et contenant un service AkkaService, 3 acteurs Mapper et 2 acteurs Reducer.
+Le service AkkaService permet de :
+- Initialiser l’architecture en créant 3 acteurs Mapper et 2
+acteurs Reducer.
+- Distribuer les lignes du fichier alternativement à chaque
+acteur Mapper.
+- Interroger les acteurs Reducer pour obtenir le nombre
+d’occurrences d’un mot.
+À chaque sollicitation, l’acteur Mapper identifie chaque mot
+de la ligne et transmet le mot à un des acteurs Reducer. Le
+choix de l’acteur Reducer se fait à l’aide d’une méthode
+partition que vous fournirez, et qui, à partir d’un tableau
+de Reducer et d’un mot, retourne la référence du Reducer à
+contacter pour ce mot. Chaque acteur Reducer additionne
+les décomptes qu’il reçoit pour chaque mot.
+Développer une application Spring qui permet d’interagir avec AkkaService. Faire en sorte
+que les cinq acteurs soient localisés dans deux systèmes d’acteurs différents.
+Travail à rendre
+1. Une démonstration du fonctionnement de l’application.
+2. Le code de l’application.
