@@ -6,7 +6,6 @@ import akka.actor.Props;
 import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.example.TP_3_CAR.akka.Acteur.ActeurMapper;
 import com.example.TP_3_CAR.akka.Acteur.ActeurReducer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
