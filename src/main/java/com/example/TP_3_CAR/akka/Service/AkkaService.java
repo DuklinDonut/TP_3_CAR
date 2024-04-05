@@ -6,6 +6,7 @@ import akka.actor.Props;
 import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.example.TP_3_CAR.akka.Acteur.ActeurMapper;
 import com.example.TP_3_CAR.akka.Acteur.ActeurReducer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +32,7 @@ public class AkkaService {
     private List<ActorRef> reducersList;
 
     public void initializeActors() {
-        actorSystem = ActorSystem.create("MRSystem");
+        actorSystem = ActorSystem.create("MapReduceSystem");
         mappers = new ActorRef[3];
         reducers = new ActorRef[2];
 
