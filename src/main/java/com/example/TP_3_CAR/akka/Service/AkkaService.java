@@ -18,7 +18,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
@@ -70,29 +72,37 @@ public class AkkaService {
         int totalOccurrences = 0;
         Timeout timeout = new Timeout(Duration.create(5, "seconds"));
 
+        // Utilisez un ensemble pour stocker les réductions déjà interrogées
+        Set<ActorRef> queriedReducers = new HashSet<>();
+
         for (ActorRef reducer : reducersList) {
-            try {
-                Future<Object> future = Patterns.ask(reducer, new ActeurReducer.getWord(word), timeout);
+            if (!queriedReducers.contains(reducer)) {
+                try {
+                    Future<Object> future = Patterns.ask(reducer, new ActeurReducer.getWord(word), timeout);
+                    CompletionStage<Object> javaFuture = FutureConverters.toJava(future);
 
-                CompletionStage<Object> javaFuture = FutureConverters.toJava(future);
+                    CompletionStage<Integer> processedFuture = javaFuture.thenApply(response -> {
+                        if (response instanceof ActeurReducer.WordCount) {
+                            return ((ActeurReducer.WordCount) response).count;
+                        } else {
+                            return 0;
+                        }
+                    });
 
-                CompletionStage<Integer> processedFuture = javaFuture.thenApply(response -> {
-                    if (response instanceof ActeurReducer.WordCount) {
-                        return ((ActeurReducer.WordCount) response).count;
-                    } else {
-                        return 0;
-                    }
-                });
+                    Integer result = processedFuture.toCompletableFuture().get(5, TimeUnit.SECONDS);
+                    totalOccurrences += result;
 
-                Integer result = processedFuture.toCompletableFuture().get(5, TimeUnit.SECONDS);
-                totalOccurrences += result;
-            } catch (AskTimeoutException e) {
-                System.err.println("Timeout occurred while waiting for response from reducer: " + e.getMessage());
-            } catch (Exception e) {
-                e.printStackTrace();
+                    // Marquez ce réducteur comme interrogé
+                    queriedReducers.add(reducer);
+                } catch (AskTimeoutException e) {
+                    System.err.println("Timeout occurred while waiting for response from reducer: " + e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-        System.out.println(totalOccurrences);
+
+        System.out.println("Total occurrences: " + totalOccurrences);
         return totalOccurrences;
     }
 }

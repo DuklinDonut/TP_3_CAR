@@ -4,17 +4,21 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ActeurMapper extends UntypedActor {
 
     private final List<ActorRef> reducersList;
     private Map<String, Integer> wordCounts;
+    private Set<String> wordsInCurrentLine;
 
     public ActeurMapper(List<ActorRef> reducersList) {
         this.reducersList = reducersList;
         this.wordCounts = new HashMap<>();
+        this.wordsInCurrentLine = new HashSet<>();
     }
 
     @Override
@@ -23,6 +27,14 @@ public class ActeurMapper extends UntypedActor {
             String line = (String) message;
             String[] words = line.split("\\s+");
             for (String word : words) {
+                // Si le mot est déjà dans la ligne actuelle, passez au suivant
+                if (wordsInCurrentLine.contains(word)) {
+                    continue;
+                }
+                // Sinon, marquez-le comme vu dans la ligne actuelle
+                wordsInCurrentLine.add(word);
+
+                // Mise à jour du compteur de mots
                 ActorRef reducer = partition(word);
                 if (!wordCounts.containsKey(word)) {
                     wordCounts.put(word, 1);
@@ -30,6 +42,8 @@ public class ActeurMapper extends UntypedActor {
                     wordCounts.put(word, wordCounts.get(word) + 1);
                 }
             }
+            // Réinitialisez les mots dans la ligne actuelle après le traitement de la ligne
+            wordsInCurrentLine.clear();
             sendWordCountsToReducers();
         } else {
             unhandled(message);
@@ -47,7 +61,7 @@ public class ActeurMapper extends UntypedActor {
     }
 
     private ActorRef partition(String word) {
-        int reducerIndex = Math.abs(word.hashCode()) % reducersList.size();
+        int reducerIndex = (word.hashCode() & Integer.MAX_VALUE) % reducersList.size();
         return reducersList.get(reducerIndex);
     }
 }

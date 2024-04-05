@@ -2,15 +2,18 @@ package com.example.TP_3_CAR.akka.Acteur;
 
 import akka.actor.UntypedActor;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ActeurReducer extends UntypedActor {
 
+    private Map<String, Set<String>> processedTexts; // Garder une trace des textes déjà traités par chaque reducer
     private Map<String, Integer> wordCounts;
 
     public ActeurReducer() {
-        this.wordCounts = new HashMap<>();
+        this.processedTexts = new ConcurrentHashMap<>(); // Utilisation de ConcurrentHashMap
+        this.wordCounts = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -29,12 +32,24 @@ public class ActeurReducer extends UntypedActor {
     }
 
     private void updateWordCount(String word, int count) {
-        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + count);
+        // Supprimer la ponctuation du mot
+        word = word.replaceAll("[^a-zA-Z]", "").toLowerCase();
+
+        // Mettre à jour le comptage de mots
+        wordCounts.compute(word, (key, existingValue) -> (existingValue == null) ? count : existingValue + count);
+        System.out.println("Updated count for word '" + word + "': " + wordCounts.get(word));
     }
 
+
+
     private int getWordCount(String word) {
-        return wordCounts.getOrDefault(word, 0);
+        if (wordCounts.containsKey(word)) {
+            return wordCounts.get(word);
+        } else {
+            return 0;
+        }
     }
+
 
     public static class WordCount {
         public final String word;
