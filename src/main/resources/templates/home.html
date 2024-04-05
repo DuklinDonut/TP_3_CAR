@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>TP3 - Akka</title>
+</head>
+
+<body>
+
+    <h1>TP3 - Akka</h1>
+
+    <h2>Initialisation des acteurs Akka</h2>
+    <form th:action="@{/init}" method="post">
+        <button type="submit">Initialiser les acteurs</button>
+    </form>
+
+    <h2>Fichier à analyser</h2>
+    <form th:action="@{/file}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file"><br>
+        <button type="submit">Analyser le fichier</button>
+    </form>
+
+    <h2>Chercher un mot</h2>
+    <form th:action="@{/search}" method="post">
+        <label for="word">Entrez un mot à rechercher :</label>
+        <input type="text" id="word" name="word" required>
+        <button type="submit">Rechercher</button>
+    </form>
+
+    <div>
+        <p>Le nombre d'occurrences <strong th:text="${searchedWord}"></strong>: <span th:text="${wordCount}"></span></p>
+    </div>
+
+</body>
+
+</html>
