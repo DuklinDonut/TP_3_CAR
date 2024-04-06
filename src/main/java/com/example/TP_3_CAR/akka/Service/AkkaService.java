@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class AkkaService {
@@ -56,11 +57,18 @@ public class AkkaService {
     public void distributeLines(MultipartFile file) {
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Distributing line: " + line);
-                for (ActorRef mapper : mappers) {
-                    mapper.tell(line, ActorRef.noSender());
+            List<String> lines = reader.lines().collect(Collectors.toList());
+            int totalLines = lines.size();
+            int linesPerMapper = totalLines / mappers.length;
+
+            for (int i = 0; i < mappers.length; i++) {
+                int startIndex = i * linesPerMapper;
+                int endIndex = (i == mappers.length - 1) ? totalLines : (i + 1) * linesPerMapper;
+
+                List<String> linesForMapper = lines.subList(startIndex, endIndex);
+                for (String line : linesForMapper) {
+                    System.out.println("Distributing line to mapper " + i + ": " + line);
+                    mappers[i].tell(line, ActorRef.noSender());
                 }
             }
         } catch (Exception e) {
