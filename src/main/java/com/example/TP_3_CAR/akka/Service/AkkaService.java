@@ -17,10 +17,7 @@ import scala.concurrent.duration.Duration;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -57,24 +54,29 @@ public class AkkaService {
     public void distributeLines(MultipartFile file) {
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            List<String> lines = reader.lines().collect(Collectors.toList());
-            int totalLines = lines.size();
-            int linesPerMapper = totalLines / mappers.length;
+            List<String> words = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                words.addAll(Arrays.asList(line.split("\\s+")));
+            }
 
-            for (int i = 0; i < mappers.length; i++) {
-                int startIndex = i * linesPerMapper;
-                int endIndex = (i == mappers.length - 1) ? totalLines : (i + 1) * linesPerMapper;
+            int totalWords = words.size();
+            int wordsPerMapper = totalWords / mappers.length;
 
-                List<String> linesForMapper = lines.subList(startIndex, endIndex);
-                for (String line : linesForMapper) {
-                    System.out.println("Distributing line to mapper " + i + ": " + line);
-                    mappers[i].tell(line, ActorRef.noSender());
-                }
+            int startIndex = 0;
+            for (ActorRef mapper : mappers) {
+                int endIndex = Math.min(startIndex + wordsPerMapper, totalWords);
+                List<String> wordsForMapper = words.subList(startIndex, endIndex);
+                String message = String.join(" ", wordsForMapper);
+                mapper.tell(message, ActorRef.noSender());
+                System.out.println("Distributing words to mapper: " + message);
+                startIndex = endIndex;
             }
         } catch (Exception e) {
             System.out.println("Error distributing file lines" + e);
         }
     }
+
 
     public int searchWordOccurrences(String word) {
         int totalOccurrences = 0;

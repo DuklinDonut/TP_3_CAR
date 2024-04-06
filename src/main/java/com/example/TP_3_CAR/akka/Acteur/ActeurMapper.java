@@ -21,34 +21,22 @@ public class ActeurMapper extends UntypedActor {
         this.wordsInCurrentLine = new HashSet<>();
     }
 
+
     @Override
     public void onReceive(Object message) throws Throwable {
         if (message instanceof String) {
             String line = (String) message;
             String[] words = line.split("\\s+");
             for (String word : words) {
-                // Si le mot est déjà dans la ligne actuelle, passez au suivant
-                if (wordsInCurrentLine.contains(word)) {
-                    continue;
-                }
-                // Sinon, marquez-le comme vu dans la ligne actuelle
-                wordsInCurrentLine.add(word);
-
-                // Mise à jour du compteur de mots
+                // chaque mot vers le reducer correct
                 ActorRef reducer = partition(word);
-                if (!wordCounts.containsKey(word)) {
-                    wordCounts.put(word, 1);
-                } else {
-                    wordCounts.put(word, wordCounts.get(word) + 1);
-                }
+                reducer.tell(new ActeurReducer.WordCount(word, 1), getSelf());
             }
-            // Réinitialisez les mots dans la ligne actuelle après le traitement de la ligne
-            wordsInCurrentLine.clear();
-            sendWordCountsToReducers();
         } else {
             unhandled(message);
         }
     }
+
 
     private void sendWordCountsToReducers() {
         for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {

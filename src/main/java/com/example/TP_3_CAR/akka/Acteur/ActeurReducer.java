@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ActeurReducer extends UntypedActor {
 
-    private Map<String, Set<String>> processedTexts; // Garder une trace des textes déjà traités par chaque reducer
+    private Map<String, Set<String>> processedTexts; // pour garder une trace des textes déjà traités par chaque reducer
     private Map<String, Integer> wordCounts;
 
     public ActeurReducer() {
-        this.processedTexts = new ConcurrentHashMap<>(); // Utilisation de ConcurrentHashMap
+        this.processedTexts = new ConcurrentHashMap<>();
         this.wordCounts = new ConcurrentHashMap<>();
     }
 
