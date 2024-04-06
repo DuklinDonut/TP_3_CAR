@@ -30,16 +30,20 @@ Une méthode resetActors() a été ajoutée au service AkkaService pour initiali
 ## Démonstration
  
  1. Accès:
+    
 ![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/fcf094cf-11d1-41ca-b234-bd913df2dc51)
  
  2. Choisir un fichier (pour cet exemple j'ai choisit l'énoncé du TP):
+    
 ![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/33997ade-3b7c-4de3-9fdd-e269be03d931)
+
+ 3. Résultats en log:
  
- 3.Résultats en log:
 ![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/05895c2a-ff20-418f-ac23-ee40ce127eeb)
 ![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/6c5e7a5c-cf18-4ced-bef4-ce295e907abf)
  
- 4.Exemple de comptage du nombre d'occurrences:
+ 4. Exemple de comptage du nombre d'occurrences:
+    
 ![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/083592c4-4ff4-4e21-ab37-073da7901ba1)
 
 
