@@ -44,7 +44,7 @@ Une méthode resetActors() a été ajoutée au service AkkaService pour initiali
  
  4. Exemple de comptage du nombre d'occurrences:
     
-![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/083592c4-4ff4-4e21-ab37-073da7901ba1)
+![image](https://github.com/DuklinDonut/TP_3_CAR/assets/86496857/4a42a831-3622-4df3-8f83-40661168fb14)
 
 
 ## Conclusion
