@@ -20,12 +20,6 @@ public class AkkaController {
         return "home";
     }
 
-    @PostMapping("/init")
-    public String initializeActors() {
-        akkaService.initializeActors();
-        return "redirect:/";
-    }
-
     @PostMapping("/file")
     public String analyzeFile(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {

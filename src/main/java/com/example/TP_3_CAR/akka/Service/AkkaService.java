@@ -50,8 +50,15 @@ public class AkkaService {
             System.out.println(mapperName);
         }
     }
+    public void resetActors() {
+        if (actorSystem != null) {
+            actorSystem.terminate();
+        }
+        initializeActors();
+    }
 
     public void distributeLines(MultipartFile file) {
+        resetActors();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             List<String> words = new ArrayList<>();
